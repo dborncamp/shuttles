@@ -1,0 +1,15 @@
+const mongoose = require('mongoose');
+
+const shuttleSchema = new mongoose.Shcema({
+    number: {type: Number, unique: true},
+    rider: String,
+    shuttleDate: Date,
+    shuttleSource: String,
+    shuttleDest: String,
+    color: String
+    }, { timestamps: true }
+);
+
+const Shuttle = mongoose.model('Shuttle', shuttleSchema);
+
+module.exports = Shuttle;

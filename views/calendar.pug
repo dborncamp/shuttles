@@ -1,0 +1,38 @@
+extends layout
+
+block content
+  script(type="text/javascript", src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js")
+  script(type="text/javascript", src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.2/moment.min.js")
+  script(type='text/javascript', src="http://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.0.1/fullcalendar.min.js")
+  h1 The current schedule
+  p Something New
+
+  h3 Listing Shuttles:
+
+  ul
+    p one
+    for shuttle in shuttles
+      li= shuttle.number
+  #calendar
+  script.
+    $('#calendar').fullCalendar({
+      header: {
+      	left: 'prev,next today',
+      	center: 'title',
+      	right: 'month,agendaWeek,agendaDay,listWeek'
+      },
+      defaultDate: Date().toString(), //'2016-10-12',
+      defaultView: 'agendaWeek',
+      navLinks: true, // can click day/week names to navigate views
+      editable: true,
+      eventLimit: true, // allow "more" link when too many events
+      weekends: false,
+      events: function(start, end, callback){
+      
+      },
+      eventClick: function(calEvent, jsEvent, view){
+          alert("an event has been clicked!");
+      },
+      selectable: true, // allow clicking to add events
+      selectHelper: true,
+    });

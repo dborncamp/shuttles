@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  .page-header
+    p This is a very simple test of reading from Mongo database using Express and the pug framework.
+    h3 All Books
+
+  ul
+    for b in books
+      li= b.name
