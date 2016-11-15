@@ -138,9 +138,10 @@ app.post('/account/profile', passportConfig.isAuthenticated, userController.post
 app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
-app.get('/calendar', calendarController.getShuttles)
+app.get('/calendar', calendarController.ReadAll);
+app.get('/ReadAll', calendarController.ReadAll);
+app.post('/calendar', calendarController.postShuttle);
 app.get('/books', bookController.getBooks);
-
 
 /**
  * API examples routes.

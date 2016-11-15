@@ -1,17 +1,18 @@
 const mongoose = require('mongoose');
 
 const shuttleSchema = new mongoose.Schema({
-    number: {type: Number, unique: true},
-    rider: String,
-    shuttleDate: Date,
-    shuttleSource: String,
-    shuttleDest: String,
-    color: String,
-    requestedDate: Date
-    }, { timestamps: true }
+    rider: String,          // user that is riding
+    shuttleDate: Date,      // date of the shuttle in ISO format
+    shuttleDept: String,    // departing location
+    shuttleAriv: String,    // arriving location
+    shuttleTitle: String,   // Name for the shuttle
+    color: String,          // based on destination
+    requestedDate: Date,    // when was it requested
+    status: String          // has the driver confirmed?
+    }
 );
 
-const Shuttle = mongoose.model('shuttles', shuttleSchema);
+const Shuttle = mongoose.model('shuttle', shuttleSchema);
 
 module.exports = Shuttle;
 
