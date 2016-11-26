@@ -140,7 +140,7 @@ app.post('/account/delete', passportConfig.isAuthenticated, userController.postD
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
 app.get('/calendar', calendarController.ReadAll);
 app.get('/ReadAll', calendarController.ReadAll);
-app.post('/calendar', calendarController.postShuttle);
+app.post('/calendar', passportConfig.isAuthenticated, calendarController.postShuttle);
 app.get('/books', bookController.getBooks);
 
 /**

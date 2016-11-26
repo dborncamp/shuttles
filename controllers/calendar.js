@@ -16,10 +16,10 @@ exports.calendar = (req, res) => {
 };
 
 /**
- * GET /books
+ * GET /Shuttles
  * List all Shuttles.
  */
-exports.getAll = (req, res) => {
+exports.ReadAll = (req, res) => {
     Shuttle.find((err, results) => {
         if (err) {alert("Something went wrong with the database in controler");}
         console.log("Looking for Shuttles");
@@ -37,7 +37,8 @@ exports.getAll = (req, res) => {
  *
  * Submit for a shuttle.
  */
-exports.postShuttle = (req, res) => {
+exports.postShuttle = (req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
     req.assert('time', "Shuttle time cannot be blank.").notEmpty();
     req.assert('date', "Shuttle date cannot be blank.").notEmpty();
     req.assert('dept', "Shuttle source cannot be blank.").notEmpty();

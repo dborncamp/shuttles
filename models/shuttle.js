@@ -16,20 +16,10 @@ const Shuttle = mongoose.model('shuttle', shuttleSchema);
 
 module.exports = Shuttle;
 
-
 /**
  * Test entry
  *
- * db.shuttle.insert({number: 123, rider: "Dave", shuttleDate: new Date("2016-11-13T16:15"), shuttleSource: "Rotunda", shuttleDest: "Muller", color: "Blue", requestDate: new Date() });
+ * db.shuttle.insert({rider: "Dave", shuttleDate: new Date("2016-11-13T16:15"), shuttleDept: "Rotunda", shuttleAriv: "Muller", color: "Blue", requestDate: new Date(), status: "pending" });
  *
  *
-const mongoose = require('mongoose');
-
-const bookSchema = new mongoose.Schema({
-  name: String
-});
-
-const Book = mongoose.model('Book', bookSchema);
-module.exports = Book;
-
  */
