@@ -138,9 +138,12 @@ app.post('/account/profile', passportConfig.isAuthenticated, userController.post
 app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
-app.get('/calendar', calendarController.ReadAll);
+// Calendar things
+app.get('/calendar', calendarController.calendar);
 app.get('/ReadAll', calendarController.ReadAll);
+app.get('/ReadRange', calendarController.ReadRange);
 app.post('/calendar', passportConfig.isAuthenticated, calendarController.postShuttle);
+//Book things
 app.get('/books', bookController.getBooks);
 
 /**

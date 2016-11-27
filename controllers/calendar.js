@@ -17,20 +17,56 @@ exports.calendar = (req, res) => {
 
 /**
  * GET /Shuttles
- * List all Shuttles.
+ * List all Shuttles. will likely be useless for actual implementation...
  */
 exports.ReadAll = (req, res) => {
     Shuttle.find((err, results) => {
         if (err) {alert("Something went wrong with the database in controler");}
         console.log("Looking for Shuttles");
         console.log(results);
-        res.render('calendar',
-            {test: results,
-             title: "Calendar"
-            }
-        );
+        res.send(results);
+
     });
 };
+
+/**
+ * Get the shuttles for a range of dates using a RESTful API
+ *
+ * Only looks for greater than startDate and less than endDate. If either of
+ * there are undefined, its ok, that side of the bounding just wont be there.
+ */
+exports.ReadRange = (req, res) => {
+    // make the mongodb query, get the strings and turn them into moment objects
+    console.log("query:");
+    console.log(req.query);
+    console.log('');
+    var sdate = req.query.start;
+    var edate = req.query.end;
+
+    if (sdate == null){
+        sdate = 0; // sometime in 1969
+    }
+    if (edate == null){
+        edate = 9999999999999; // sometime in 2286
+    }
+
+    console.log(sdate);
+    var momStart = moment(sdate);
+    var momEnd = moment(edate);
+
+    console.log(momStart);
+    // construct the mongo query
+    var query = {start: {$gt: momStart, $lt: momEnd}};
+    console.log(query);
+    
+    // now find the shuttles
+    Shuttle.find(query, (err, results) =>{
+        if (err) {alert("Something went wrong with the database in controler");}
+        console.log(results);
+        res.send(results);
+    });
+}
+
 
 /**
  * Post /shuttle
@@ -54,9 +90,11 @@ exports.postShuttle = (req, res, next) => {
     console.log("Reading request:");
     console.log(req.body.date);
     console.log(req.body.time);
-    var utcDate = moment(req.body.date + ' ' + req.body.time, 'MM/DD/YYYY hh:mm');
+    var startDate = moment(req.body.date + ' ' + req.body.time, 'MM/DD/YYYY hh:mm');
+    var endDate = moment(startDate).add(15, 'minutes');
 
-    console.log(utcDate.utc().format());
+    console.log(startDate.utc().format());
+    console.log(endDate.utc().format());
     console.log(req.body.dept);
     console.log(req.body.ariv);
     console.log("");
@@ -67,10 +105,11 @@ exports.postShuttle = (req, res, next) => {
 
     const shuttle = new Shuttle({
         rider: req.user._id,
-        shuttleDate: utcDate.utc().format(),
-        shuttleDept: req.body.dept,
-        shuttleAriv: req.body.ariv,
-        shuttleTitle: title,
+        start: startDate.utc().format(),
+        end: endDate.utc().format(),
+        dept: req.body.dept,
+        ariv: req.body.ariv,
+        title: title,
         color: 'blue',
         requestedDate: moment.utc().format(),
         status: 'pending'

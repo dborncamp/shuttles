@@ -62,13 +62,20 @@ block content
             | Submit
     |       
 
+    .right
+      span#loading loading...
+      | &#x9;&#x9;&#x9;
+      span#script-warning
+        code shuttles
+        |  must be running.
+
     script(type='text/javascript').
       $.fn.datetimepicker.defaults = {
         maskInput: true,           // disables the text input mask
         pickDate: true,            // disables the date picker
         pickTime: true,            // disables de time picker
-        pick12HourFormat: true,   // enables the 12-hour format time picker
-        pickSeconds: false,         // disables seconds in the time picker
+        pick12HourFormat: true,    // enables the 12-hour format time picker
+        pickSeconds: false,        // disables seconds in the time picker
         startDate: -Infinity,      // set a minimum date
         endDate: Infinity          // set a maximum date
       };
@@ -98,21 +105,39 @@ block content
         defaultDate: moment.utc().format(), //'2016-10-12',
         defaultView: 'agendaWeek',
         navLinks: true, // can click day/week names to navigate views
-        editable: true,
+        editable: false,
         eventLimit: true, // allow "more" link when too many events
         weekends: false,
-        events: function(start, end, callback){
-        
-        },
+        timezone: true,
+        eventSources: [  // use a restful api for this, it looks for start and end
+            "http://localhost:3000/ReadRange?"
+        ],
         eventClick: function(calEvent, jsEvent, view){
             alert("an event has been clicked!");
         },
         selectable: true, // allow clicking to add events
         selectHelper: true,
+        eventRender: function(event, el) {
+            // render the timezone offset below the event title
+            if (event.start.hasZone()) {
+                console.log('timezone');
+                el.find('.fc-title').after(
+                    $('<div class="tzo"/>').text(event.start.format('Z'))
+                );
+            }
+        },
+        loading: function(bool) {
+            $('#loading').toggle(bool);
+        }
+        
       });
+      $('#calendar').fullCalendar('option', 'timezone', 'America/New_York');
+      console.log("Calendar date: " + $('#calendar').fullCalendar('getDate').toDate());
+
+        
 
 
-
+  //
     h3 Listing Shuttles:
      
     #calendar.fullCalendar({events: test})

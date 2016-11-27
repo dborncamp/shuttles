@@ -2,11 +2,12 @@ const mongoose = require('mongoose');
 
 const shuttleSchema = new mongoose.Schema({
     rider: String,          // user that is riding
-    shuttleDate: Date,      // date of the shuttle in ISO format
-    shuttleDept: String,    // departing location
-    shuttleAriv: String,    // arriving location
-    shuttleTitle: String,   // Name for the shuttle
-    color: String,          // based on destination
+    start: Date,            // date and time of the shuttle in ISO format
+    end: Date,              // date and time of the shuttle ending
+    deptarture: String,     // departing location
+    arival: String,         // arriving location
+    title: String,          // Name for the shuttle
+    color: String,          // based on destination, probably dont need...
     requestedDate: Date,    // when was it requested
     status: String          // has the driver confirmed?
     }
