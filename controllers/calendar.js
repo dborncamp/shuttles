@@ -91,6 +91,8 @@ exports.postShuttle = (req, res, next) => {
     console.log(req.body.date);
     console.log(req.body.time);
     var startDate = moment(req.body.date + ' ' + req.body.time, 'MM/DD/YYYY hh:mm');
+    // hack for timezone issues
+    startDate.subtract(5, 'hours')
     var endDate = moment(startDate).add(15, 'minutes');
 
     console.log(startDate.utc().format());
