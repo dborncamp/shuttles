@@ -5,6 +5,7 @@ block content
     link(href='http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css', rel='stylesheet')
     |     
     link(rel='stylesheet', type='text/css', media='screen', href='http://tarruda.github.com/bootstrap-datetimepicker/assets/css/bootstrap-datetimepicker.min.css')
+    link(rel='stylesheet', type='text/css', media='screen', href='https://cdnjs.cloudflare.com/ajax/libs/qtip2/3.0.3/jquery.qtip.min.css')
     |     
     script(type='text/javascript', src='http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js')
     |  
@@ -14,7 +15,8 @@ block content
     script(type='text/javascript', src='http://tarruda.github.com/bootstrap-datetimepicker/assets/js/bootstrap-datetimepicker.min.js')
     script(type="text/javascript", src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.2/moment.min.js")
     script(type='text/javascript', src="http://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.0.1/fullcalendar.min.js")
-
+    script(type='text/javascript', src="https://cdnjs.cloudflare.com/ajax/libs/qtip2/3.0.3/jquery.qtip.min.js")
+    script(type='text/javascript', src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js")
   | 
 
   body
@@ -94,8 +96,55 @@ block content
         language: 'pt-BR'
       });
 
+    #external-events
+    script.
+    //
+      $('#external-events').each(function() {
+        // create an Event Object (http://arshaw.com/fullcalendar/docs/event_data/Event_Object/)
+        // it doesn't need to have a start or end
+        var eventObject = {
+        	title: $.trim($(this).text()) // use the element's text as the event title
+        };
+        console.log("event thing");
+        
+        // store the Event Object in the DOM element so we can get to it later
+        $(this).data('eventObject', eventObject);
+        
+        // make the event draggable using jQuery UI
+        $(this).draggable({
+            zIndex: 999,
+            revert: true,      // will cause the event to go back to its
+            revertDuration: 0  //  original position after the drag
+        });
+
+      });
+
     #calendar
     script.
+      var tooltip = $('<div/>').qtip({
+          id: 'fullcalendar',
+          prerender: true,
+              content: {
+              text: ' ',
+              title: {
+                  button: true
+              }
+          },
+          position: {
+              my: 'bottom center',
+              at: 'top center',
+              target: 'mouse',
+              viewport: $('#fullcalendar'),
+              adjust: {
+                  mouse: false,
+                  scroll: false
+              }
+          },
+          show: false,
+          hide: false,
+          style: 'qtip-light'
+      }).qtip('api');
+
       $('#calendar').fullCalendar({
         header: {
         	left: 'prev,next today',
@@ -109,22 +158,21 @@ block content
         eventLimit: true, // allow "more" link when too many events
         weekends: false,
         timezone: true,
+        dropable: true,
         eventSources: [  // use a restful api for this, it looks for start and end
             "http://localhost:3000/ReadRange?"
         ],
-        eventClick: function(calEvent, jsEvent, view){
-            alert("an event has been clicked!");
-        },
         selectable: true, // allow clicking to add events
         selectHelper: true,
-        eventRender: function(event, el) {
-            // render the timezone offset below the event title
-            if (event.start.hasZone()) {
-                console.log('timezone');
-                el.find('.fc-title').after(
-                    $('<div class="tzo"/>').text(event.start.format('Z'))
-                );
-            }
+        eventClick: function(data, event, view) {
+            var content = '<h3>'+data.title+'</h3>' + 
+                '<p><b>Start:</b> '+data.start+'<br />' + 
+                (data.end && '<p><b>End:</b> '+data.end+'</p>' || '');
+            
+            tooltip.set({
+                'content.text': content
+            })
+            .reposition(event).show(event);
         },
         loading: function(bool) {
             $('#loading').toggle(bool);
