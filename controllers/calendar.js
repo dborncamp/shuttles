@@ -37,9 +37,6 @@ exports.ReadAll = (req, res) => {
  */
 exports.ReadRange = (req, res) => {
     // make the mongodb query, get the strings and turn them into moment objects
-    console.log("query:");
-    console.log(req.query);
-    console.log('');
     var sdate = req.query.start;
     var edate = req.query.end;
 
@@ -50,21 +47,80 @@ exports.ReadRange = (req, res) => {
         edate = 9999999999999; // sometime in 2286
     }
 
-    console.log(sdate);
     var momStart = moment(sdate);
     var momEnd = moment(edate);
 
-    console.log(momStart);
     // construct the mongo query
     var query = {start: {$gt: momStart, $lt: momEnd}};
-    console.log(query);
     
     // now find the shuttles
     Shuttle.find(query, (err, results) =>{
         if (err) {alert("Something went wrong with the database in controler");}
-        console.log(results);
         res.send(results);
     });
+}
+
+
+exports.postShuttleRest = (req, res, next) =>{
+    var date = req.body.date;
+    var time = req.body.time;
+    var dept = req.body.dept;
+    var ariv = req.body.ariv;
+    var rider = req.body.rider;
+
+    // first some error checking, probably a better way to do this...
+    var missing = '';
+    if(!req.query.date){ missing = 'date'; }
+    if(!req.query.time){ missing = 'time'; }
+    if(!req.query.dept){ missing = 'dept'; }
+    if(!req.query.ariv){ missing = 'ariv'; }
+    if(!req.query.rider){ missing = 'rider'; }
+    // if we have an error return an error
+    if (missing != ''){
+        //return res.send({'status': 'Error', 'Missing: ' + missing});
+        req.flash("errors", {msg: "Missing: " + missing});
+    }
+
+
+    var startDate = moment(date + ' ' + time, 'MM/DD/YYYY hh:mm');
+    // hack for timezone issues... need a better solution
+    startDate.subtract(5, 'hours')
+    var endDate = moment(startDate).add(15, 'minutes');
+
+    var title = req.body.dept + " " + req.body.ariv;
+
+    // get the color
+    var color = '';
+    if (req.body.dept == 'muller' & req.body.ariv == 'rotunda'){ color = 'blue'; }
+    if (req.body.dept == 'rotunda' & req.body.ariv == 'muller'){ color = 'purple';}
+    if (req.body.dept == 'muller' & req.body.ariv == 'stief'){ color = 'teal';}
+    if (req.body.dept == 'stief' & req.body.ariv == 'muller'){ color = 'pink';}
+    if (req.body.dept == 'stief' & req.body.ariv == 'rotunda'){ color = 'brown';}
+
+    // something bad happened...
+    if (color == ''){
+        req.flash("errors", {msg: "Something went wrong pushing shuttle."});
+    }
+
+    const shuttle = new Shuttle({
+        rider: rider,
+        start: startDate.utc().format(),
+        end: endDate.utc().format(),
+        dept: dept,
+        ariv: ariv,
+        title: title,
+        color: color,
+        requestedDate: moment.utc().format(),
+        status: 'pending'
+    });
+
+    shuttle.save((err) =>{
+        if (err){
+            req.flash("errors", {msg: "Something went wrong pushing shuttle."});
+        }
+        req.flash("success", {msg: "successfully created shuttle"});
+    });
+    res.redirect("/calendar");
 }
 
 
@@ -87,6 +143,11 @@ exports.postShuttle = (req, res, next) => {
         return res.redirect('/calendar');
     }
 
+    if (req.body.dept == req.body.ariv){
+        req.flash("errors", {msg: "Departure and Arrival locations cannot be the same"});
+    }
+
+
     console.log("Reading request:");
     console.log(req.body.date);
     console.log(req.body.time);
@@ -105,6 +166,29 @@ exports.postShuttle = (req, res, next) => {
 
     var title = req.body.dept + " " + req.body.ariv;
 
+    // get the color
+    var color = '';
+    if (req.body.dept == 'muller' & req.body.ariv == 'rotunda'){
+        color = 'blue';
+    }
+    if (req.body.dept == 'rotunda' & req.body.ariv == 'muller'){
+        color = 'purple';
+    }
+    if (req.body.dept == 'muller' & req.body.ariv == 'stief'){
+        color = 'teal';
+    }
+    if (req.body.dept == 'stief' & req.body.ariv == 'muller'){
+        color = 'pink';
+    }
+    if (req.body.dept == 'stief' & req.body.ariv == 'rotunda'){
+        color = 'brown';
+    }
+
+    // something bad happened...
+    if (color == ''){
+        req.flash("errors", {msg: "Something went wrong coloring the shuttle."});
+    }
+
     const shuttle = new Shuttle({
         rider: req.user._id,
         start: startDate.utc().format(),
@@ -112,7 +196,7 @@ exports.postShuttle = (req, res, next) => {
         dept: req.body.dept,
         ariv: req.body.ariv,
         title: title,
-        color: 'blue',
+        color: color,
         requestedDate: moment.utc().format(),
         status: 'pending'
     });

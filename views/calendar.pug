@@ -7,6 +7,7 @@ block content
     link(rel='stylesheet', type='text/css', media='screen', href='http://tarruda.github.com/bootstrap-datetimepicker/assets/css/bootstrap-datetimepicker.min.css')
     link(rel='stylesheet', type='text/css', media='screen', href='https://cdnjs.cloudflare.com/ajax/libs/qtip2/3.0.3/jquery.qtip.min.css')
     |     
+    link(rel='stylesheet', type='text/css', media='screen', href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css')
     script(type='text/javascript', src='http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js')
     |  
     |     
@@ -21,6 +22,19 @@ block content
 
   body
     h2 Schedule a shuttle, or click the calendar.
+    br
+
+    br
+    div
+      a.button(id='button' href='#') something
+      br
+    script(type='text/javascript').
+      $("#dialog").dialog({ autoOpen: false });
+
+      $('.button').click(function() {
+        console.log($('#dialog')); //.dialog('open');
+      });
+
     form(method='POST')
       input(type='hidden', name='_csrf', value=_csrf)
       |     
@@ -48,7 +62,7 @@ block content
         select(name = "dept" id="dept")
           option(value="muller") Muller
           option(value="rotunda") Rotunda
-          option(value="steif") Steif
+          option(value="stief") Steif
       |       
       .form-group
         label(class='col-sm-3 control-label', for='arriv') Where are you going to?
@@ -56,20 +70,21 @@ block content
         select(name = "ariv" id="ariv")
           option(value="muller") Muller
           option(value="rotunda") Rotunda
-          option(value="steif") Steif
+          option(value="stief") Steif
       |       
       .form-group
         .col-sm-offset-2.col-sm-8
           button.btn.btn-primary(type='submit')
             | Submit
     |       
-
     .right
       span#loading loading...
       | &#x9;&#x9;&#x9;
       span#script-warning
         code shuttles
         |  must be running.
+
+      
 
     script(type='text/javascript').
       $.fn.datetimepicker.defaults = {
@@ -154,20 +169,25 @@ block content
         defaultDate: moment.utc().format(), //'2016-10-12',
         defaultView: 'agendaWeek',
         navLinks: true, // can click day/week names to navigate views
-        editable: false,
+        editable: false,  // allow manipulating events on the GUI
         eventLimit: true, // allow "more" link when too many events
-        weekends: false,
-        timezone: true,
+        weekends: false,  // dont show weekends
+        timezone: true,  // try to get timezones working
         dropable: true,
-        eventSources: [  // use a restful api for this, it looks for start and end
+        eventSources: [  // use a restful api, it looks for start and end
             "http://localhost:3000/ReadRange?"
         ],
         selectable: true, // allow clicking to add events
-        selectHelper: true,
+        selectHelper: true, // round to nearest 'nice' time
         eventClick: function(data, event, view) {
+            console.log(data);
+            start = moment(data.start).format();
+            end = moment(data.end).format()
+            request = moment(data.requestedDate).format()
             var content = '<h3>'+data.title+'</h3>' + 
-                '<p><b>Start:</b> '+data.start+'<br />' + 
-                (data.end && '<p><b>End:</b> '+data.end+'</p>' || '');
+                '<p><b>Departs:</b> '+start+'<br />' + 
+                (end && '<p><b>Arrive:</b> '+end+'<br /p>' || '') +
+                '<p><b>Requested on:</b> '+request+'<br /p>';
             
             tooltip.set({
                 'content.text': content
@@ -176,6 +196,40 @@ block content
         },
         loading: function(bool) {
             $('#loading').toggle(bool);
+        },
+        select: function(start, end, allday) {
+            // <form action="demo_form.asp">
+            //  First name: <input type="text" name="fname"><br>
+            //  Last name: <input type="text" name="lname"><br>
+            //  <input type="submit" value="Submit">
+            //</form> 
+            
+            var start = event.start;
+            console.log(start);
+
+            var content = '<h3> New event:</h3>' +
+                //'Time: ' + start + ' <br /> ';
+                '<form>' +
+                ' Departure: <br />' +
+                '<select value="departure" name="dept"> '+
+                ' <option value="Muller">muller</option>' +
+                ' <option value="Rotunda">rotunda</option>' +
+                ' <option value="Steif">steif</option>' +
+                '</select> <br />' +
+                'Arrival: <br />' +
+                '<select value=arrival name="ariv"> '+
+                ' <option value="Muller">muller</option>' +
+                ' <option value="Rotunda">rotunda</option>' +
+                ' <option value="Steif">steif</option>' +
+                '</select> <br />' +
+                '<input type="submit" value="Submit">' +
+                '</form>';
+            tooltip.set({
+                'content.text': content
+                
+            }).reposition(event).show(event);
+
+            console.log(ariv);
         }
         
       });
@@ -183,6 +237,9 @@ block content
       console.log("Calendar date: " + $('#calendar').fullCalendar('getDate').toDate());
 
         
+    br
+    br
+    br
 
 
   //
