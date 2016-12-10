@@ -1,0 +1,88 @@
+extends layout
+
+
+block content
+  .page-header
+    link(rel='stylesheet', type='text/css', media='screen', href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.min.css')
+    |     
+    script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js')
+    |     
+    script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js')
+    |     
+    script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.5/js/bootstrap.js')
+    |     
+    script(type='text/javascript', src='http://tarruda.github.com/bootstrap-datetimepicker/assets/js/bootstrap-datetimepicker.min.js')
+
+  body
+    h2 Schedule a shuttle, or click the calendar.
+    br
+    br
+    script(type='text/javascript').
+
+    form(method='POST')
+      input(type='hidden', name='_csrf', value=_csrf)
+      |     
+      .form-group
+        label(calss='col-sm-3 control-label', for='date') Date
+        |       
+        #datepicker.input-append.date
+          input(type='text', name='date', id='date', placeholder='date', required)
+          |         
+          span.add-on
+            i(data-time-icon='icon-time', data-date-icon='icon-calendar')
+      |       
+      .form-group
+        label(calss='col-sm-3 control-label', for='time') Time
+        |       
+        #timepicker.input-append.date
+          input(type='text', name='time', id='time', placeholder='time', required)
+          |         
+          span.add-on
+            i(data-time-icon='icon-time', data-date-icon='icon-calendar')
+      |       
+      .form-group
+        label(class='col-sm-3 control-label', for='dept') Where are you coming from?
+        |       
+        select(name = "dept" id="dept")
+          option(value="muller") Muller
+          option(value="rotunda") Rotunda
+          option(value="stief") Steif
+      |       
+      .form-group
+        label(class='col-sm-3 control-label', for='arriv') Where are you going to?
+        |       
+        select(name = "ariv" id="ariv")
+          option(value="rotunda") Rotunda
+          option(value="muller") Muller
+          option(value="stief") Steif
+      |       
+      .form-group
+        .col-sm-offset-2.col-sm-8
+          button.btn.btn-primary(type='submit')
+            | Submit
+
+    script(type='text/javascript').
+      $.fn.datetimepicker.defaults = {
+        maskInput: true,           // disables the text input mask
+        pickDate: true,            // disables the date picker
+        pickTime: true,            // disables de time picker
+        pick12HourFormat: true,    // enables the 12-hour format time picker
+        pickSeconds: false,        // disables seconds in the time picker
+        startDate: -Infinity,      // set a minimum date
+        endDate: Infinity          // set a maximum date
+      };
+
+    script(type='text/javascript').
+      $('#datepicker').datetimepicker({
+        pickTime: false,
+        format: 'MM/dd/yyyy',
+        language: 'pt-BR'
+      });
+
+    script(type='text/javascript').
+      $('#timepicker').datetimepicker({
+        pickDate: false,
+        format: 'hh:mm',
+        language: 'pt-BR'
+      });
+

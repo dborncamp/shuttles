@@ -8,7 +8,7 @@
         span.icon-bar
         span.icon-bar
       a.navbar-brand(href='/')
-        i.fa.fa-cube
+        i.fa.fa-cube(href='/')
         | Shuttle Site
     .collapse.navbar-collapse
       ul.nav.navbar-nav
@@ -16,6 +16,8 @@
           a(href='/') Home
         li(class=(title == 'Calendar') ? 'active' : undefined)
           a(href='/calendar') Calendar
+        li(class=(title == 'Order') ? 'active' : undefined)
+          a(href='/order') Order
         li(class=(title == 'Contact') ? 'active' : undefined)
           a(href='/contact') Contact
         li

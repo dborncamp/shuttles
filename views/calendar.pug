@@ -2,38 +2,33 @@ extends layout
 
 block content
   .page-header
-    link(href='http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css', rel='stylesheet')
     |     
-    link(rel='stylesheet', type='text/css', media='screen', href='http://tarruda.github.com/bootstrap-datetimepicker/assets/css/bootstrap-datetimepicker.min.css')
+    link(rel='stylesheet', type='text/css', media='screen', href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.min.css')
     link(rel='stylesheet', type='text/css', media='screen', href='https://cdnjs.cloudflare.com/ajax/libs/qtip2/3.0.3/jquery.qtip.min.css')
     |     
     link(rel='stylesheet', type='text/css', media='screen', href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css')
-    script(type='text/javascript', src='http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js')
     |  
+    script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js')
     |     
-    script(type='text/javascript', src='http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js')
+    script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js')
+    |     
+    script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.5/js/bootstrap.js')
     |     
     script(type='text/javascript', src='http://tarruda.github.com/bootstrap-datetimepicker/assets/js/bootstrap-datetimepicker.min.js')
+    |  
     script(type="text/javascript", src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.2/moment.min.js")
+    |  
     script(type='text/javascript', src="http://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.0.1/fullcalendar.min.js")
+    |  
     script(type='text/javascript', src="https://cdnjs.cloudflare.com/ajax/libs/qtip2/3.0.3/jquery.qtip.min.js")
+    |  
     script(type='text/javascript', src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js")
-  | 
 
   body
     h2 Schedule a shuttle, or click the calendar.
     br
-
     br
-    div
-      a.button(id='button' href='#') something
-      br
     script(type='text/javascript').
-      $("#dialog").dialog({ autoOpen: false });
-
-      $('.button').click(function() {
-        console.log($('#dialog')); //.dialog('open');
-      });
 
     form(method='POST')
       input(type='hidden', name='_csrf', value=_csrf)
@@ -68,8 +63,8 @@ block content
         label(class='col-sm-3 control-label', for='arriv') Where are you going to?
         |       
         select(name = "ariv" id="ariv")
-          option(value="muller") Muller
           option(value="rotunda") Rotunda
+          option(value="muller") Muller
           option(value="stief") Steif
       |       
       .form-group
@@ -109,29 +104,6 @@ block content
         pickDate: false,
         format: 'hh:mm',
         language: 'pt-BR'
-      });
-
-    #external-events
-    script.
-    //
-      $('#external-events').each(function() {
-        // create an Event Object (http://arshaw.com/fullcalendar/docs/event_data/Event_Object/)
-        // it doesn't need to have a start or end
-        var eventObject = {
-        	title: $.trim($(this).text()) // use the element's text as the event title
-        };
-        console.log("event thing");
-        
-        // store the Event Object in the DOM element so we can get to it later
-        $(this).data('eventObject', eventObject);
-        
-        // make the event draggable using jQuery UI
-        $(this).draggable({
-            zIndex: 999,
-            revert: true,      // will cause the event to go back to its
-            revertDuration: 0  //  original position after the drag
-        });
-
       });
 
     #calendar

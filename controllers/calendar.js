@@ -99,20 +99,22 @@ exports.postShuttleRest = (req, res, next) =>{
 
     // something bad happened...
     if (color == ''){
-        req.flash("errors", {msg: "Something went wrong pushing shuttle."});
+        req.flash("errors", {msg: "Something went wrong pushing shuttle. Check the destination and arrival."});
     }
 
-    const shuttle = new Shuttle({
-        rider: rider,
-        start: startDate.utc().format(),
-        end: endDate.utc().format(),
-        dept: dept,
-        ariv: ariv,
-        title: title,
-        color: color,
-        requestedDate: moment.utc().format(),
-        status: 'pending'
-    });
+    if (color != ''){
+        const shuttle = new Shuttle({
+            rider: rider,
+            start: startDate.utc().format(),
+            end: endDate.utc().format(),
+            dept: dept,
+            ariv: ariv,
+            title: title,
+            color: color,
+            requestedDate: moment.utc().format(),
+            status: 'pending'
+        });
+    }
 
     shuttle.save((err) =>{
         if (err){
