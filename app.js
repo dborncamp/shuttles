@@ -142,6 +142,8 @@ app.get('/calendar', calendarController.calendar);
 app.get('/ReadAll', calendarController.ReadAll);
 app.get('/ReadRange', calendarController.ReadRange);
 app.post('/calendar', passportConfig.isAuthenticated, calendarController.postShuttle);
+app.post('/calendarRest', passportConfig.isAuthenticated, calendarController.postShuttleRest);
+
 app.get('/order', orderController.order);
 app.post('/order', passportConfig.isAuthenticated, calendarController.postShuttle);
 

@@ -28,10 +28,9 @@ block content
     h2 Schedule a shuttle, or click the calendar.
     br
     br
-    script(type='text/javascript').
 
-    form(method='POST')
-      input(type='hidden', name='_csrf', value=_csrf)
+    form(method='POST', id='request')
+      input(type='hidden', name='_csrf', id='_csrf', value=_csrf)
       |     
       .form-group
         label(calss='col-sm-3 control-label', for='date') Date
@@ -170,29 +169,28 @@ block content
             $('#loading').toggle(bool);
         },
         select: function(start, end, allday) {
-            // <form action="demo_form.asp">
-            //  First name: <input type="text" name="fname"><br>
-            //  Last name: <input type="text" name="lname"><br>
-            //  <input type="submit" value="Submit">
-            //</form> 
             
-            var start = event.start;
-            console.log(start);
+            console.log(start.format("HH:mm"));
+            var _csrf = $("#_csrf").val()
 
             var content = '<h3> New event:</h3>' +
                 //'Time: ' + start + ' <br /> ';
-                '<form>' +
+                '<h4 id=date>' + start.format("MM/DD/YYYY") + '</h4> <br />' +
+                '<form method="POST">' +
+                '<input type="hidden" name="_csrf" value="' + _csrf + '"> <br />' +
+                '<input type="hidden" name="date" value='+start.format("MM/DD/YYYY")+'><br>'+
+                '<input type="hidden" name="time" value='+start.format("HH:mm")+'><br>'+
                 ' Departure: <br />' +
                 '<select value="departure" name="dept"> '+
-                ' <option value="Muller">muller</option>' +
-                ' <option value="Rotunda">rotunda</option>' +
-                ' <option value="Steif">steif</option>' +
+                ' <option value="muller">Muller</option>' +
+                ' <option value="rotunda">Rotunda</option>' +
+                ' <option value="stief">Stief</option>' +
                 '</select> <br />' +
                 'Arrival: <br />' +
                 '<select value=arrival name="ariv"> '+
-                ' <option value="Muller">muller</option>' +
-                ' <option value="Rotunda">rotunda</option>' +
-                ' <option value="Steif">steif</option>' +
+                ' <option value="muller">Muller</option>' +
+                ' <option value="rotunda">Rotunda</option>' +
+                ' <option value="stief">Stief</option>' +
                 '</select> <br />' +
                 '<input type="submit" value="Submit">' +
                 '</form>';
@@ -201,7 +199,6 @@ block content
                 
             }).reposition(event).show(event);
 
-            console.log(ariv);
         }
         
       });

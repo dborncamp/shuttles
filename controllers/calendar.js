@@ -62,16 +62,15 @@ exports.ReadRange = (req, res) => {
 
 
 exports.postShuttleRest = (req, res, next) =>{
-    var date = req.body.date;
-    var time = req.body.time;
+    res.header("Access-Control-Allow-Origin", "*");
+    var start = req.body.start;
     var dept = req.body.dept;
     var ariv = req.body.ariv;
     var rider = req.body.rider;
 
     // first some error checking, probably a better way to do this...
     var missing = '';
-    if(!req.query.date){ missing = 'date'; }
-    if(!req.query.time){ missing = 'time'; }
+    if(!req.query.start){ missing = 'start'; }
     if(!req.query.dept){ missing = 'dept'; }
     if(!req.query.ariv){ missing = 'ariv'; }
     if(!req.query.rider){ missing = 'rider'; }
@@ -79,10 +78,11 @@ exports.postShuttleRest = (req, res, next) =>{
     if (missing != ''){
         //return res.send({'status': 'Error', 'Missing: ' + missing});
         req.flash("errors", {msg: "Missing: " + missing});
+        return res.redirect("/calendar");
     }
 
 
-    var startDate = moment(date + ' ' + time, 'MM/DD/YYYY hh:mm');
+    var startDate = moment(start);
     // hack for timezone issues... need a better solution
     startDate.subtract(5, 'hours')
     var endDate = moment(startDate).add(15, 'minutes');
@@ -100,6 +100,7 @@ exports.postShuttleRest = (req, res, next) =>{
     // something bad happened...
     if (color == ''){
         req.flash("errors", {msg: "Something went wrong pushing shuttle. Check the destination and arrival."});
+        res.redirect("/calendar");
     }
 
     if (color != ''){
@@ -122,7 +123,6 @@ exports.postShuttleRest = (req, res, next) =>{
         }
         req.flash("success", {msg: "successfully created shuttle"});
     });
-    res.redirect("/calendar");
 }
 
 
@@ -151,11 +151,11 @@ exports.postShuttle = (req, res, next) => {
 
 
     console.log("Reading request:");
-    console.log(req.body.date);
-    console.log(req.body.time);
-    var startDate = moment(req.body.date + ' ' + req.body.time, 'MM/DD/YYYY hh:mm');
+    console.log("Date: " + req.body.date);
+    console.log("Time: " + req.body.time);
+    var startDate = moment(req.body.date + ' -07' + req.body.time, 'MM/DD/YYYY hh:mm z');
     // hack for timezone issues
-    startDate.subtract(5, 'hours')
+    //startDate.subtract(5, 'hours')
     var endDate = moment(startDate).add(15, 'minutes');
 
     console.log(startDate.utc().format());
