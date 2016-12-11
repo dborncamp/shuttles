@@ -102,6 +102,7 @@ block content
       $('#timepicker').datetimepicker({
         pickDate: false,
         format: 'hh:mm',
+        useUtc : true,
         language: 'pt-BR'
       });
 
@@ -143,7 +144,8 @@ block content
         editable: false,  // allow manipulating events on the GUI
         eventLimit: true, // allow "more" link when too many events
         weekends: false,  // dont show weekends
-        timezone: true,  // try to get timezones working
+        ignoreTimezone: false,
+        //timezone: true,  // try to get timezones working
         dropable: true,
         eventSources: [  // use a restful api, it looks for start and end
             "http://localhost:3000/ReadRange?"
@@ -152,12 +154,15 @@ block content
         selectHelper: true, // round to nearest 'nice' time
         eventClick: function(data, event, view) {
             console.log(data);
-            start = moment(data.start).format();
-            end = moment(data.end).format()
-            request = moment(data.requestedDate).format()
+            var locations = data.title.split(' ')
+            var dept = locations[0];
+            var ariv = locations[1];
+            var start = moment(data.start).format('HH:mm');
+            var end = moment(data.end).format('HH:mm');
+            var request = moment(data.requestedDate).format()
             var content = '<h3>'+data.title+'</h3>' + 
-                '<p><b>Departs:</b> '+start+'<br />' + 
-                (end && '<p><b>Arrive:</b> '+end+'<br /p>' || '') +
+                '<h4><b>Departs: </b> '+dept+' at: '+start+'</h4><br />' + 
+                '<h4><b>Arrive:</b> '+ariv+' at: '+end+'</h4><br />' +
                 '<p><b>Requested on:</b> '+request+'<br /p>';
             
             tooltip.set({
@@ -171,15 +176,15 @@ block content
         select: function(start, end, allday) {
             
             console.log(start.format("HH:mm"));
+            console.log(start.utc().format());
             var _csrf = $("#_csrf").val()
 
             var content = '<h3> New event:</h3>' +
-                //'Time: ' + start + ' <br /> ';
-                '<h4 id=date>' + start.format("MM/DD/YYYY") + '</h4> <br />' +
-                '<form method="POST">' +
+                '<h4>' + start.format("MM/DD/YYYY") + '</h4> <br />' +
+                '<h4>' + start.format("HH:mm") + '</h4> <br />'+
+                '<form method="GET" action="/calendarRest">' +
                 '<input type="hidden" name="_csrf" value="' + _csrf + '"> <br />' +
-                '<input type="hidden" name="date" value='+start.format("MM/DD/YYYY")+'><br>'+
-                '<input type="hidden" name="time" value='+start.format("HH:mm")+'><br>'+
+                '<input type="hidden" name="start" value='+start.utc().format()+'>'+
                 ' Departure: <br />' +
                 '<select value="departure" name="dept"> '+
                 ' <option value="muller">Muller</option>' +
@@ -209,23 +214,5 @@ block content
     br
     br
     br
-
-
-  //
-    h3 Listing Shuttles:
-     
-    #calendar.fullCalendar({events: test})
-    ul
-      for shuttle in test
-        li= shuttle.rider, shuttle.shuttleDept,  shuttle.shuttleAriv
-  //  
-    script.
-        for(i=0; i<$("#test").length; i++){
-            shuttle = $("#test")[i];
-            console.log(shuttle);
-            var title = shuttle.shuttleDept + " to " + shuttle.shuttle.ariv;
-            console.log(title);
-
-    // #calendar'.fullCalendar('renderEvent', json[i], true);
 
 

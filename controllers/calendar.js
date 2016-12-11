@@ -61,19 +61,37 @@ exports.ReadRange = (req, res) => {
 }
 
 
-exports.postShuttleRest = (req, res, next) =>{
+exports.ShuttleRest = (req, res, next) =>{
     res.header("Access-Control-Allow-Origin", "*");
-    var start = req.body.start;
-    var dept = req.body.dept;
-    var ariv = req.body.ariv;
-    var rider = req.body.rider;
+    
+    var start = req.query.start;
+    var dept = req.query.dept;
+    var ariv = req.query.ariv;
+    //var rider = req.body.rider;
+    var rider = req.user._id;
+
+    console.log("Query: ");
+    console.log(req.query);
+
+    console.log("Body: ");
+    console.log(req.body);
+    console.log(" ");
+
+    console.log("Start:");
+    console.log(start);
+    console.log("Dept:");
+    console.log(dept);
+    console.log("Ariv:");
+    console.log(ariv);
+    console.log("User:");
+    console.log(req.user);
 
     // first some error checking, probably a better way to do this...
     var missing = '';
-    if(!req.query.start){ missing = 'start'; }
-    if(!req.query.dept){ missing = 'dept'; }
-    if(!req.query.ariv){ missing = 'ariv'; }
-    if(!req.query.rider){ missing = 'rider'; }
+    if(!start){ missing = 'start'; }
+    if(!dept){ missing = 'dept'; }
+    if(!ariv){ missing = 'ariv'; }
+    if(!rider){ missing = 'rider'; }
     // if we have an error return an error
     if (missing != ''){
         //return res.send({'status': 'Error', 'Missing: ' + missing});
@@ -81,41 +99,44 @@ exports.postShuttleRest = (req, res, next) =>{
         return res.redirect("/calendar");
     }
 
+    if(dept == ariv){
+        req.flash("errors", {msg: "Cannot depart and arrive at same location"});
+        return res.redirect("/calendar");
+    }
+
 
     var startDate = moment(start);
     // hack for timezone issues... need a better solution
-    startDate.subtract(5, 'hours')
+    //startDate.subtract(5, 'hours')
     var endDate = moment(startDate).add(15, 'minutes');
 
     var title = req.body.dept + " " + req.body.ariv;
 
     // get the color
     var color = '';
-    if (req.body.dept == 'muller' & req.body.ariv == 'rotunda'){ color = 'blue'; }
-    if (req.body.dept == 'rotunda' & req.body.ariv == 'muller'){ color = 'purple';}
-    if (req.body.dept == 'muller' & req.body.ariv == 'stief'){ color = 'teal';}
-    if (req.body.dept == 'stief' & req.body.ariv == 'muller'){ color = 'pink';}
-    if (req.body.dept == 'stief' & req.body.ariv == 'rotunda'){ color = 'brown';}
+    if (dept == 'muller' & ariv == 'rotunda'){ color = 'blue'; }
+    if (dept == 'rotunda' & ariv == 'muller'){ color = 'purple';}
+    if (dept == 'muller' & ariv == 'stief'){ color = 'teal';}
+    if (dept == 'stief' & ariv == 'muller'){ color = 'pink';}
+    if (dept == 'stief' & ariv == 'rotunda'){ color = 'brown';}
 
     // something bad happened...
     if (color == ''){
-        req.flash("errors", {msg: "Something went wrong pushing shuttle. Check the destination and arrival."});
-        res.redirect("/calendar");
+        req.flash("errors", {msg: "Something went wrong coloring shuttle using REST. Check the destination and arrival."});
+        return res.redirect("/calendar");
     }
 
-    if (color != ''){
-        const shuttle = new Shuttle({
-            rider: rider,
-            start: startDate.utc().format(),
-            end: endDate.utc().format(),
-            dept: dept,
-            ariv: ariv,
-            title: title,
-            color: color,
-            requestedDate: moment.utc().format(),
-            status: 'pending'
-        });
-    }
+    const shuttle = new Shuttle({
+        rider: rider,
+        start: startDate.utc().format(),
+        end: endDate.utc().format(),
+        dept: dept,
+        ariv: ariv,
+        title: title,
+        color: color,
+        requestedDate: moment.utc().format(),
+        status: 'pending'
+    });
 
     shuttle.save((err) =>{
         if (err){
@@ -123,6 +144,7 @@ exports.postShuttleRest = (req, res, next) =>{
         }
         req.flash("success", {msg: "successfully created shuttle"});
     });
+    res.redirect("/calendar");
 }
 
 
@@ -152,19 +174,21 @@ exports.postShuttle = (req, res, next) => {
 
     console.log("Reading request:");
     console.log("Date: " + req.body.date);
-    console.log("Time: " + req.body.time);
-    var startDate = moment(req.body.date + ' -07' + req.body.time, 'MM/DD/YYYY hh:mm z');
+    console.log("Given Time: " + req.body.time);
+    var startDate = moment(req.body.date + ' -04' + req.body.time, 'MM/DD/YYYY hh:mm z');
     // hack for timezone issues
     //startDate.subtract(5, 'hours')
     var endDate = moment(startDate).add(15, 'minutes');
 
-    console.log(startDate.utc().format());
+    console.log("Calculated Time: "+startDate.utc().format());
     console.log(endDate.utc().format());
     console.log(req.body.dept);
     console.log(req.body.ariv);
     console.log("");
     console.log(req.user);
     console.log("");
+
+    //return res.redirect('/calendar');
 
     var title = req.body.dept + " " + req.body.ariv;
 
